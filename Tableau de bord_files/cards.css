@@ -1,0 +1,176 @@
+.bank-card-new {
+    width: 373px;
+    height: 220px;
+    font-family: "Dosis",sans-serif;
+    margin: auto;
+}
+
+.bank-card-new #card-expiration {
+    font-size: 12px;
+    font-weight: bold;
+    padding-top: 50px;
+    padding-left: 35px;
+    color: rgb(255, 255, 255);
+}
+
+.bank-card-new #balance-amount {
+    font-size: 30px;
+    font-weight: bold;
+    padding-left: 35px;
+    color: rgb(255, 255, 255);
+}
+
+#kyc-state {
+    margin-left: 35px;
+    margin-top: 30px;
+    width: 50px;
+}
+
+#card-status {
+    width: 250px;
+    margin: auto;
+    border-radius: 50px;
+    background-color: #da1f1a;
+    height: 40px;
+    text-align: center;
+    vertical-align: middle;
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+    font-weight: bold;
+    padding-top: 7px;
+    margin-top: 10px;
+    line-height: 1.6rem;
+}
+
+.bank-card #card-status {
+    margin-top: -165px;
+}
+
+#card-status + #card-expiration {
+    padding-top: 8px;
+}
+
+@media (max-width: 1400px) {
+    #balance-amount {
+        padding-top: 6px;
+    }
+}
+@media (max-width: 992px) {
+    .bank-card-new {
+        width: 295px;
+        height: 174px;
+    }
+
+    .bank-card-new #card-expiration {
+        padding-top: 40px;
+        padding-left: 35px;
+    }
+
+    #kyc-state {
+        margin-left: 35px;
+        margin-top: 25px;
+        width: 35px;
+    }
+
+    #card-status {
+        width: 200px;
+        height: 30px;
+        font-size: 18px;
+        line-height: 15px;
+    }
+
+    #card-status + #card-expiration {
+        padding-top: 5px;
+    }
+}
+
+.neutral-card-new { 
+    background-image: url('./Carte_neutre.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.chrome-card-new { 
+    background-image: url('./Chrome.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.infinity-card-new {
+    background-image: url('./Infinity.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.black-card-new {
+    background-image: url('./Black.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.digital-card-new {
+    background-image: url('./MetalX.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.absolut-card-new {
+    background-image: url('./Absolut.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.neutral-contactless-card-new {
+    background-image: url('./Carte_neutre_contactless.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.chrome-contactless-card-new {
+    background-image: url('./Chrome_contactless.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.infinity-contactless-card-new {
+    background-image: url('./Infinity_contactless.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.black-contactless-card-new {
+    background-image: url('carteblack.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.digital-contactless-card-new {
+    background-image: url('./MetalX_contactless.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.absolut-contactless-card-new {
+    background-image: url('./Absolut_contactless.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.virtual-card-new, .virtual-contactless-card-new {
+    background-image: url('./CARTE_VIRTUAL_CARD.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
