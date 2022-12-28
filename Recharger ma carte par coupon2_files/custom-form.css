@@ -1,0 +1,57 @@
+:root {
+    --pcs-input-muted-color: #f5f5f5;
+
+    --pcs-payment-input-fontsize: 1.875rem;
+    --pcs-amount-input-fontsize: 2.813rem;
+}
+
+/* CUSTOM FORM INPUT */
+.custom-form-input {
+    font-size: 1.875rem;
+    font-weight: bold;
+    text-align: center;
+    height: 100px;
+    width: 100%;
+    padding: 1.625rem;}
+.custom-input-sm {
+    height: 60px;
+    padding: 0.625rem;}
+
+.custom-form-input:placeholder-shown {border-bottom-color: #f5f5f5;}
+
+/* Chrome/Opera/Safari */
+.custom-form-input::-webkit-input-placeholder {
+    color: #b4b4b4;
+    font-weight: 400 !important;}
+/* Firefox 19+ */
+.custom-form-input::-moz-placeholder {
+    color: #b4b4b4;
+    font-weight: 400 !important;}
+/* IE 10+ */
+.custom-form-input:-ms-input-placeholder {
+    color: #b4b4b4;
+    font-weight: 400 !important;}
+/* Firefox 18- */
+.custom-form-input:-moz-placeholder{
+    color: #b4b4b4;
+    font-weight: 400 !important;}
+
+.custom-form-input::placeholder {
+    color: #b4b4b4;
+    font-weight: 400 !important;}
+
+.custom-form-input:focus-visible {
+    outline: none;
+    border-bottom-style: dotted;}
+
+.amount-input {position: relative;}
+.amount-input::after {
+    content:"\20ac";
+    font-size: 1.875rem;
+    color: #b4b4b4;
+    right: 3rem;
+    top:25%;
+    position: absolute;}
+
+.amount-input input {font-size: 2.813rem}
+.amount-input input:placeholder-shown {font-size: 1.875rem}

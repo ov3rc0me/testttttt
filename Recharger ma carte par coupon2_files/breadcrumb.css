@@ -1,0 +1,29 @@
+.page-breadcrumb {
+    margin-top: 50px;
+    padding-left:0;
+    list-style: none;
+    text-align: center;
+    font-size: 0.75rem;
+    white-space: normal!important;}
+    @media (min-width: 576px) {.page-breadcrumb {font-size: 1rem;}}
+    @media (min-width: 992px) {.page-breadcrumb {font-size: 1.125rem;}}
+
+    .breadcrumb-step {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        position: relative;}
+        .breadcrumb-step-icon {
+            width: 22px!important;
+            height:22px!important;
+            margin-bottom: 0.625rem;}
+            .breadcrumb-step.active .step-inactive {display: none;}
+            .step-active {display: none;}
+            .breadcrumb-step.active .step-active {display: block;}
+        .breadcrumb-step-line {
+            position:absolute;
+            left: calc(50% + 16px);
+            top: 11px;
+            height: 0px;
+            width: calc(100% - 32px);}
