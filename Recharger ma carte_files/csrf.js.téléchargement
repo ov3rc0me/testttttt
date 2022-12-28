@@ -1,0 +1,54 @@
+if ($("script[data-token]").length)
+{
+	// Fills in an anti-CSRF security token in all forms that haven't already one.
+	function antiCsrfFormSecurityTokenInjector()
+	{
+		$('form').each(function(i, form) {
+			if ($(form).find('input[name="data[_Token][key]"]').length === 0)
+				$(form).prepend('<input type="hidden" name="data[_Token][key]" value="' + $("script[data-token]").data("token") + '">');
+		});
+	}
+	
+	antiCsrfFormSecurityTokenInjector();
+	
+	// $.ajax decorator for CSRF token injection. Also works for $.post.
+	(function(jqAjax){
+		$.ajax = function(){
+			if ($("script[data-token]").length)
+			{
+				try {
+					var settings = typeof arguments[0] === 'object' ? arguments[0] : (typeof arguments[1] === 'object' ? arguments[1] : null);
+					if (typeof settings === 'object' && 
+						( (typeof settings.type === 'string' && settings.type.toLowerCase() === 'post')
+					    || (typeof settings.method === 'string' && settings.method.toLowerCase() === 'post') )
+					){
+						if (typeof settings.data !== 'object' && typeof settings.data !== 'string') settings.data = {};
+						if (typeof settings.data !== 'string')
+							settings.data._Token= {key: $("script[data-token]").data("token")};
+					} else {
+						throw 1;
+					}
+				} catch(e) {return jqAjax.apply(this, arguments).done(antiCsrfFormSecurityTokenInjector); }
+					
+				if (typeof arguments[0].success === 'function') {
+					var success_callback = arguments[0].success;
+					arguments[0].success = function(data) {
+						try {
+							var response = data;
+							if (typeof data !== 'object')
+								var response = $.parseJSON(data);
+							
+							if (typeof response === 'object' && response.hasOwnProperty('csrfblackhole')) {
+								location.reload(true); 
+								message('danger', response.message);
+								return;
+							}
+						} catch(e){}
+						success_callback(data);
+					};
+				}
+			}
+			return jqAjax.apply(this, arguments).done(antiCsrfFormSecurityTokenInjector);
+		};
+	})($.ajax);
+}
