@@ -1,0 +1,297 @@
+function message(type, texte) 
+{
+	$.notify(
+		"<em class='fa "+(type == 'success' ? 'fa-check text-green' : 'fa-ban text-danger')+"'></em>&nbsp;&nbsp;&nbsp;"+texte, 
+		{pos:"top-right", timeout:10000}
+	);
+}
+
+function showSpinner(message)
+{
+    $('#spinner').show();
+
+    if (message)
+    {
+        $("#spinner .spinner-message").remove();
+        $("#spinner .spinner").prepend("<div class=\"spinner-message\">" + message + "</div>");
+    }
+}
+
+function hideSpinner()
+{
+    $('#spinner').hide();
+    $("#spinner .spinner-message").remove();
+}
+
+/**
+ * http://www.sitepoint.com/javascript-copy-to-clipboard/
+ */
+function copyText(sender, field, label, labelError)
+{
+	if (field && field.select) 
+	{
+		field.select();
+	
+		try 
+		{
+			document.execCommand('copy');
+			field.blur();
+			
+			if (label)
+				message("success", label);
+		}
+		catch (err) 
+		{
+			message("error", labelError);
+		}
+	}
+}
+
+function filter(val, named, isNull) 
+{
+	if (typeof(isNull) === "undefined") isNull = val != '';
+	deletePage();
+	reg = new RegExp("/"+named+":[^/]*","g");
+	url = window.urlPage.replace(reg, '');
+	url = url+(isNull ? "/"+named+":"+protectChars(val) : '');
+	refreshPageAjax(url);
+}
+
+function refreshPageAjax(url, params) 
+{
+	showSpinner();
+	url = typeof(url) == 'undefined' ? window.urlPage : url;
+	params = typeof(params) == 'undefined' ? {} : params;
+	$.ajax({
+		url: url,
+		type: 'POST',
+		data: params,
+		dataType:"html", 
+		evalScripts:true,
+		error:function (data, textStatus) {
+			window.location.href = '/fr/login';
+		},
+		success:function (data, textStatus) {
+			$("#PageContainer").html(data);
+			ProjectEventsManager.notify("onContentLoaded");
+		}
+	});
+}
+
+function deletePage() 
+{
+	var reg = new RegExp("/page:[0-9]+","g");
+	window.urlPage = window.urlPage.replace(reg, '');
+}
+
+function protectChars(val)
+{
+	val = val.replace(/\//g, "-");
+	return val;
+}
+
+var ProjectEventsManager = {
+	events: {},
+	
+	attach: function(eventName, listener)
+	{
+		if (typeof this.events[eventName] == "undefined")
+			this.events[eventName] = [];
+		
+		this.events[eventName].push(listener);
+	},
+	
+	notify: function(eventName)
+	{
+		if (typeof this.events[eventName] == "undefined")
+			return;
+		
+		for (var i in this.events[eventName])
+		{
+			this.events[eventName][i]();
+		}
+	}
+};
+
+function spinnerForPagination()
+{
+	ProjectEventsManager.attach("onContentLoaded", function(){
+		$(".pagination li:not(.active) a").click(function(){ showSpinner(); });
+		hideSpinner();
+	});
+}
+
+function bindSearchFields()
+{
+	ProjectEventsManager.attach("onContentLoaded", function(){
+		$("#PageContainer input[data-search]").each(function(){
+			var self = this;
+			$(self).closest("form").submit(function(){ return false; });
+			var $btn = $("#PageContainer " + $(self).data("onsubmitbtn"));
+			
+			var callback = function(){
+				filter($(self).val(), $(self).data("search"));
+			};
+			
+			$btn.click(function(){ callback(); });
+			$(self).keypress(function(event){
+				if (event.keyCode == 13)
+					callback();
+			});
+		});
+	});
+}
+
+function bindDatePickerRange(time, dateLimit = false)
+{
+	if (!$.fn.daterangepicker)
+		return;
+	
+	$(".daterange-field").each(function(){
+		var self = this;
+		$(self).daterangepicker({
+			timePicker: time,
+			timePicker24Hour: time,
+            applyClass: 'btn-primary btn-rounded pl-5 pr-5',
+			locale: {
+				format: $(self).data("format"),
+				applyLabel: ProjectTranslate.apply,
+				cancelLabel: ProjectTranslate.cancel,
+				fromLabel: ProjectTranslate.from,
+				toLabel: ProjectTranslate.to,
+				customRangeLabel: ProjectTranslate.customRange,
+				weekLabel: ProjectTranslate.week,
+				daysOfWeek: [
+					ProjectTranslate.sunday,
+					ProjectTranslate.monday,
+					ProjectTranslate.tuesday,
+					ProjectTranslate.wenesday,
+					ProjectTranslate.thursday,
+					ProjectTranslate.friday,
+					ProjectTranslate.saturday
+				],
+				monthNames: [
+					ProjectTranslate.january,
+					ProjectTranslate.february,
+					ProjectTranslate.march,
+					ProjectTranslate.april,
+					ProjectTranslate.may,
+					ProjectTranslate.june,
+					ProjectTranslate.july,
+					ProjectTranslate.august,
+					ProjectTranslate.september,
+					ProjectTranslate.october,
+					ProjectTranslate.november,
+					ProjectTranslate.december
+				]
+			},
+			alwaysShowCalendars: true,
+            maxDate: moment(),
+            dateLimit: dateLimit
+		}).on("apply.daterangepicker", function(event, picker){
+			var callback = $(self).data("onvalidate");
+			if (window.hasOwnProperty(callback) && window[callback] != null)
+				window[callback](picker);
+		});
+	});
+}
+
+function filterRangeDates(picker)
+{
+	deletePage();
+	var reg = new RegExp("(/startdate:[^/]*|/enddate:[^/]*)","g")
+	var url = urlPage.replace(reg, '');
+	var reg = new RegExp("(/startdate:)", "g");
+	url = url.replace(reg, '');
+	var startdate = picker.startDate.format(picker.locale.format);
+	var enddate = picker.endDate.format(picker.locale.format);
+
+	refreshPageAjax(url+"/startdate:" + (startdate ? protectChars(startdate) : "") + "/enddate:" + (enddate ? protectChars(enddate) : ""));
+}
+
+/**
+ * Permet dans une popin de fermer celle ci pour en ouvrir une autre à la place
+ * @param callback
+ */
+function togglePopupVisibility(callback)
+{
+	$(".modal").each(function(){
+		if ($(this).is(":visible"))
+		{
+			$("#" + $(this).attr("id")).modal("hide");
+			var mainListener = setInterval(function(){
+				if ($(".modal-backdrop").length == 0)
+				{
+					clearInterval(mainListener);
+					callback();
+				}
+			}, 100);
+		}
+	});
+}
+
+$(function(){
+	
+	spinnerForPagination();
+	bindSearchFields();
+	
+	ProjectEventsManager.notify("onContentLoaded");
+	
+});
+
+function testStrength(password, dob = null, displayMessage = true) {
+	if (password.length != 6)
+		return false;
+
+	let strength;
+	$.ajax({
+		url: "/checkpassword",
+		async: false,
+		dataType: "json",
+		type: "post",
+		data: { 
+			password: password,
+			dob: dob
+		},
+	}).done(function(response){
+		strength = response.success;
+        if (displayMessage) {
+            message(response.success ? "success" : "error", response.message);
+        }
+	});
+
+	return strength;
+}
+
+function disableAutocomplete()
+{
+	if (/chrom(e|ium)/.test(navigator.userAgent.toLowerCase()))
+		$('input[autocomplete="off"]').prop('autocomplete', 'none');
+}
+
+String.prototype.sansAccent = function(){
+	var accent = [
+		/[\300-\306]/g, /[\340-\346]/g, // A, a
+		/[\310-\313]/g, /[\350-\353]/g, // E, e
+		/[\314-\317]/g, /[\354-\357]/g, // I, i
+		/[\322-\330]/g, /[\362-\370]/g, // O, o
+		/[\331-\334]/g, /[\371-\374]/g, // U, u
+		/[\321]/g, /[\361]/g, // N, n
+		/[\307]/g, /[\347]/g, // C, c
+	];
+	var noaccent = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
+
+	var str = this;
+	for(var i = 0; i < accent.length; i++){
+		str = str.replace(accent[i], noaccent[i]);
+	}
+
+	return str;
+}
+
+const regexCity = /^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd} '/()-]*$/u;
+const regexCityInverse = /[^\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd} '/()-]/gu;
+const regexZip = /^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd} ()\/-]*$/u;
+const regexZipInverse = /[^\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd} ()\/-]/gu;
+const regexAddress = /^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd} .,&'\/()-]*$/u;
+const regexAddressInverse = /[^\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd} .,&'\/()-]/gu;
